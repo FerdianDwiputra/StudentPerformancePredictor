@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prediksi Kinerja Siswa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-2xl">
+      <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">
+        Prediksi Nilai Akhir Siswa
+      </h1>
+      <p class="text-gray-600 mb-8 text-center">
+        Isi informasi di bawah ini untuk memprediksi Nilai Akhir siswa.
+      </p>
+
+      <form id="predictionForm" class="space-y-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <label
+              for="PreviousGrade"
+              class="block text-sm font-medium text-gray-700"
+              >Nilai Sebelumnya:</label
+            >
+            <input
+              type="number"
+              id="PreviousGrade"
+              name="PreviousGrade"
+              min="0"
+              max="100"
+              required
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            />
+          </div>
+
+          <div>
+            <label
+              for="AttendanceRate"
+              class="block text-sm font-medium text-gray-700"
+              >Tingkat Kehadiran (%):</label
+            >
+            <input
+              type="number"
+              id="AttendanceRate"
+              name="AttendanceRate"
+              min="0"
+              max="100"
+              required
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            />
+          </div>
+
+          <div>
+            <label
+              for="StudyHoursPerWeek"
+              class="block text-sm font-medium text-gray-700"
+              >Jam Belajar Per Minggu:</label
+            >
+            <input
+              type="number"
+              id="StudyHoursPerWeek"
+              name="StudyHoursPerWeek"
+              min="0"
+              max="30"
+              required
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            />
+          </div>
+
+          <div>
+            <label for="Gender" class="block text-sm font-medium text-gray-700"
+              >Jenis Kelamin:</label
+            >
+            <select
+              id="Gender"
+              name="Gender"
+              required
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            >
+              <option value="Male">Laki-laki</option>
+              <option value="Female">Perempuan</option>
+            </select>
+          </div>
+
+          <div>
+            <label
+              for="ExtracurricularActivities"
+              class="block text-sm font-medium text-gray-700"
+              >Aktivitas Ekstrakurikuler:</label
+            >
+            <select
+              id="ExtracurricularActivities"
+              name="ExtracurricularActivities"
+              required
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            >
+              <option value="Yes">Ya</option>
+              <option value="No">Tidak</option>
+            </select>
+          </div>
+
+          <div>
+            <label
+              for="ParentalSupport"
+              class="block text-sm font-medium text-gray-700"
+              >Dukungan Orang Tua:</label
+            >
+            <select
+              id="ParentalSupport"
+              name="ParentalSupport"
+              required
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            >
+              <option value="Good">Baik</option>
+              <option value="Average">Rata-rata</option>
+              <option value="Poor">Kurang</option>
+            </select>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        >
+          Prediksi Nilai Akhir
+        </button>
+      </form>
+
+      <div
+        id="result"
+        class="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-md text-center text-xl font-semibold text-blue-800 hidden"
+      ></div>
+
+      <div
+        id="error"
+        class="mt-8 p-4 bg-red-50 border border-red-200 rounded-md text-center text-red-700 hidden"
+      >
+        Terjadi kesalahan saat memprediksi. Mohon coba lagi.
+      </div>
+    </div>
+
+    <script>
+      document
+        .getElementById("predictionForm")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
+
+          const form = event.target;
+          const formData = new FormData(form);
+          const data = {};
+          for (let [key, value] of formData.entries()) {
+            // Konversi nilai numerik ke tipe Number (sesuaikan dengan nama kolom baru)
+            if (
+              ["AttendanceRate", "StudyHoursPerWeek", "PreviousGrade"].includes(
+                key
+              )
+            ) {
+              data[key] = parseInt(value);
+            } else {
+              data[key] = value;
+            }
+          }
+
+          const resultDiv = document.getElementById("result");
+          const errorDiv = document.getElementById("error");
+
+          resultDiv.classList.add("hidden");
+          errorDiv.classList.add("hidden");
+          resultDiv.innerHTML = "Memprediksi...";
+          resultDiv.classList.remove("hidden");
+
+          try {
+            const response = await fetch("/predict", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(data),
+            });
+
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const result = await response.json();
+
+            if (result.prediction !== undefined) {
+              resultDiv.innerHTML = `Nilai Akhir (Prediksi): <span class="text-blue-900 font-bold text-2xl">${result.prediction}</span>`;
+            } else if (result.error) {
+              errorDiv.innerHTML = `Error: ${result.error}`;
+              errorDiv.classList.remove("hidden");
+              resultDiv.classList.add("hidden");
+            }
+          } catch (e) {
+            console.error("Fetch error:", e);
+            errorDiv.innerHTML = `Terjadi kesalahan jaringan atau server. ${e.message}`;
+            errorDiv.classList.remove("hidden");
+            resultDiv.classList.add("hidden");
+          }
+        });
+    </script>
+  </body>
+</html>
